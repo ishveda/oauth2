@@ -62,6 +62,9 @@ type Config struct {
 	// Scope specifies optional requested permissions.
 	Scopes []string
 
+	// Header custom headers
+	Header http.Header
+
 	// AuthChecker checker broken AuthHeaderProviders
 	AuthChecker func(tokenURL string) bool
 }
