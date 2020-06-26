@@ -211,6 +211,19 @@ func (c *Config) Exchange(ctx context.Context, code string, opts ...AuthCodeOpti
 	return retrieveToken(ctx, c, v)
 }
 
+// GetToken retrieves token giving the ability to provide any query param
+func (c *Config) GetToken(ctx context.Context, vals map[string]string) (*Token, error) {
+	v := url.Values{}
+	if c.RedirectURL != "" {
+		v.Set("redirect_uri", c.RedirectURL)
+	}
+
+	for key, val := range vals {
+		v.Set(key, val)
+	}
+	return retrieveToken(ctx, c, v)
+}
+
 // Client returns an HTTP client using the provided token.
 // The token will auto-refresh as necessary. The underlying
 // HTTP transport will be obtained using the provided context.
