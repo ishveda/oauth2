@@ -26,13 +26,17 @@ import (
 // Deprecated: Use context.Background() or context.TODO() instead.
 var NoContext = context.TODO()
 
-// RegisterBrokenAuthHeaderProvider previously did something. It is now a no-op.
-//
-// Deprecated: this function no longer does anything. Caller code that
-// wants to avoid potential extra HTTP requests made during
-// auto-probing of the provider's auth style should set
-// Endpoint.AuthStyle.
-func RegisterBrokenAuthHeaderProvider(tokenURL string) {}
+// RegisterBrokenAuthHeaderProvider registers an OAuth2 server
+// identified by the tokenURL prefix as an OAuth2 implementation
+// which doesn't support the HTTP Basic authentication
+// scheme to authenticate with the authorization server.
+// Once a server is registered, credentials (client_id and client_secret)
+// will be passed as query parameters rather than being present
+// in the Authorization header.
+// See https://code.google.com/p/goauth2/issues/detail?id=31 for background.
+func RegisterBrokenAuthHeaderProvider(tokenURL string) {
+	internal.RegisterBrokenAuthHeaderProvider(tokenURL)
+}
 
 // Config describes a typical 3-legged OAuth2 flow, with both the
 // client application information and the server's endpoint URLs.
@@ -57,6 +61,12 @@ type Config struct {
 
 	// Scope specifies optional requested permissions.
 	Scopes []string
+
+	// Header custom headers
+	Header http.Header
+
+	// AuthChecker checker broken AuthHeaderProviders
+	AuthChecker func(tokenURL string) bool
 }
 
 // A TokenSource is anything that can return a token.
